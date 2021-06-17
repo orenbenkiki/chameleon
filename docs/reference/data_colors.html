@@ -128,7 +128,14 @@ each row (or group of rows) such that the colors are distinct, and where more-si
 roughly designate more-similar data rows (or groups of rows).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>data_colors</span><span class='op'>(</span><span class='va'>data</span>, umap <span class='op'>=</span> <span class='cn'>TRUE</span>, minimal_saturation <span class='op'>=</span> <span class='fl'>33</span>, groups <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>data_colors</span><span class='op'>(</span>
+  <span class='va'>data</span>,
+  run_umap <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  groups <span class='op'>=</span> <span class='cn'>NULL</span>,
+  minimal_saturation <span class='op'>=</span> <span class='fl'>33</span>,
+  minimal_lightness <span class='op'>=</span> <span class='fl'>20</span>,
+  maximal_lightness <span class='op'>=</span> <span class='fl'>80</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -139,19 +146,30 @@ roughly designate more-similar data rows (or groups of rows).</p>
 variables/measurements.</p></td>
     </tr>
     <tr>
-      <th>umap</th>
-      <td><p>A boolean specifying whether to run UMAP on the data (by default, `TRUE`). If
-`FALSE`, the data matrix must have exactly 3 columns.</p></td>
-    </tr>
-    <tr>
-      <th>minimal_saturation</th>
-      <td><p>Exclude colors whose saturation (a^2 + b^2 in CIE-L*a*b* color space)
-is less than this value (by default, 33).</p></td>
+      <th>run_umap</th>
+      <td><p>A boolean specifying whether to run UMAP on the data to convert it to 3D (by default,
+`TRUE`). If `FALSE`, the data matrix must have exactly 3 columns and will be used
+as-is.</p></td>
     </tr>
     <tr>
       <th>groups</th>
       <td><p>An optional array with an entry per row containing the identifier of the group the
 row belongs to.</p></td>
+    </tr>
+    <tr>
+      <th>minimal_saturation</th>
+      <td><p>Exclude colors whose saturation (`hypot(a, b)` in CIELAB color
+space) is less than this value (by default, 33).</p></td>
+    </tr>
+    <tr>
+      <th>minimal_lightness</th>
+      <td><p>Exclude colors whose lightnes (`l` in CIELAB color space) is less
+than this value (by default, 20).</p></td>
+    </tr>
+    <tr>
+      <th>maximal_lightness</th>
+      <td><p>Exclude colors whose lightnes (`l` in CIELAB color space) is more
+than this value (by default, 80).</p></td>
     </tr>
     </table>
 
@@ -167,20 +185,19 @@ row belongs to.</p></td>
 convenient default when investigating unknown data sets. It is not meant to replace hand-picked
 colors tailored for specific data (e.g. using red colors for "bad" rows and green colors for
 "good" rows).</p>
-<p>This ensures all colors are distinct by packing the (visible part) of the CIE-L*a*b* color space
+<p>This ensures all colors are distinct by packing the (visible part) of the CIELAB color space
 with the needed number of spheres. To assign the colors to the data, it uses UMAP to reduce the
 data to 3D. It then uses principal component analysis to represent both the chosen colors (3D
 sphere centers) and the (3D UMAP) data as point clouds with coordinates in the range 0-1, and
 finally uses a stable matching algorithm to map these point clouds to each other, thereby
 assigning a color to each data row. If the data is grouped, then the center of gravity of each
 group is used to generate a color for each group.</p>
-<p>By default, "grayscale" colors (with low saturation) are excluded from the result.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'>chameleon</span><span class='fu'>::</span><span class='fu'>data_colors</span><span class='op'>(</span><span class='va'>stackloss</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "#97302D" "#F665A9" "#8C3362" "#E06AE4" "#6B9BE2" "#BF85C5" "#743997"
-#&gt;  [8] "#571BED" "#7EFBD1" "#D4828A" "#0DB069" "#19A7C4" "#EBEA6E" "#774B06"
-#&gt; [15] "#48AF1B" "#85A449" "#E0804E" "#B9F83F" "#BA9425" "#A6F98F" "#2F41CF"</div></pre>
+</div><div class='output co'>#&gt;  [1] "#4D966F" "#3B9B3D" "#818F3F" "#AF7E42" "#E55573" "#8B262B" "#D86544"
+#&gt;  [8] "#EF5205" "#967ACB" "#4A8CCA" "#EF3F9F" "#F517CC" "#721BA5" "#C5699E"
+#&gt; [15] "#C95CCC" "#8F71F9" "#3241A5" "#C84DFA" "#2387F9" "#752D7B" "#FE3847"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

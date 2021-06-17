@@ -9,7 +9,7 @@
 #' colors tailored for specific data (e.g. using red colors for "bad" rows and green colors for
 #' "good" rows).
 #'
-#' This ensures all colors are distinct by packing the (visible part) of the CIE-L*a*b* color space
+#' This ensures all colors are distinct by packing the (visible part) of the CIELAB color space
 #' with the needed number of spheres. To assign the colors to the data, it uses UMAP to reduce the
 #' data to 3D. It then uses principal component analysis to represent both the chosen colors (3D
 #' sphere centers) and the (3D UMAP) data as point clouds with coordinates in the range 0-1, and
@@ -17,16 +17,19 @@
 #' assigning a color to each data row. If the data is grouped, then the center of gravity of each
 #' group is used to generate a color for each group.
 #'
-#' By default, "grayscale" colors (with low saturation) are excluded from the result.
-#'
 #' @param data A matrix whose rows represent elements/observations and columns represent
 #'             variables/measurements.
 #' @param groups An optional array with an entry per row containing the identifier of the group the
 #'               row belongs to.
-#' @param umap A boolean specifying whether to run UMAP on the data (by default, `TRUE`). If
-#'             `FALSE`, the data matrix must have exactly 3 columns.
-#' @param minimal_saturation Exclude colors whose saturation (a^2 + b^2 in CIE-L*a*b* color space)
-#'                           is less than this value (by default, 33).
+#' @param run_umap A boolean specifying whether to run UMAP on the data to convert it to 3D (by default,
+#'                 `TRUE`). If `FALSE`, the data matrix must have exactly 3 columns and will be used
+#'                 as-is.
+#' @param minimal_saturation Exclude colors whose saturation (`hypot(a, b)` in CIELAB color
+#'                           space) is less than this value (by default, 33).
+#' @param minimal_lightness Exclude colors whose lightnes (`l` in CIELAB color space) is less
+#'                          than this value (by default, 20).
+#' @param maximal_lightness Exclude colors whose lightnes (`l` in CIELAB color space) is more
+#'                          than this value (by default, 80).
 #' @return An array with one entry per row, whose names are the matrix `rownames`, containing the
 #'         color of each row. If `groups` was specified, the array will contain one entry per
 #'         unique group identifier, whose names are the `as.character` group identifiers, containing
@@ -36,8 +39,9 @@
 #'
 #' @examples
 #' chameleon::data_colors(stackloss)
-data_colors <- function(data, umap=TRUE, minimal_saturation=33, groups=NULL) {
-    if (umap) {
+data_colors <- function(data, run_umap=TRUE, groups=NULL,
+                        minimal_saturation=33, minimal_lightness=20, maximal_lightness=80) {
+    if (run_umap) {
         data <- umap::umap(data, n_components=3)$layout
     }
 
@@ -45,15 +49,15 @@ data_colors <- function(data, umap=TRUE, minimal_saturation=33, groups=NULL) {
         data <- group_centers(data, groups)
     }
 
-    colors <- pick_n_colors(nrow(data), minimal_saturation)
+    colors <- distinct_colors(nrow(data), minimal_saturation, minimal_lightness, maximal_lightness)
 
-    data_points <- normalized_data(prcomp(data, retx=TRUE)$x)
-    color_points <- normalized_data(prcomp(colors$lab, retx=TRUE)$x)
+    data_points <- normalized_data(stats::prcomp(data, retx=TRUE)$x)
+    color_points <- normalized_data(stats::prcomp(colors$lab, retx=TRUE)$x)
 
     distances <- data_distances(data_points, color_points)
     closest_colors <- clue::solve_LSAP(distances)[1:nrow(data)]
 
-    result <- colors$names[closest_colors]
+    result <- colors$name[closest_colors]
     names(result) <- rownames(data)
     return (result)
 }
@@ -83,9 +87,9 @@ group_centers <- function(data, groups) {
     for (group_name in sort(unique(groups))) {
         group_mask <- groups == group_name
         stopifnot(sum(group_mask) > 0)
-        group_x <- mean(na.omit(data[group_mask,1]))
-        group_y <- mean(na.omit(data[group_mask,2]))
-        group_z <- mean(na.omit(data[group_mask,3]))
+        group_x <- mean(stats::na.omit(data[group_mask,1]))
+        group_y <- mean(stats::na.omit(data[group_mask,2]))
+        group_z <- mean(stats::na.omit(data[group_mask,3]))
         group_xs <- c(group_xs, group_x)
         group_ys <- c(group_ys, group_y)
         group_zs <- c(group_zs, group_z)
@@ -120,58 +124,80 @@ datum_distance <- function(x, y, z, u, v, w) {
     return (sqrt(a * a + b * b + c * c))
 }
 
-#' Pick a number of distinct colors which are sufficiently saturated.
+#' Pick a number of distinct colors.
 #'
-#' This ensures all colors are distinct by packing the (visible part) of the CIE-L*a*b* color space
-#' with the needed number of spheres and using their centers to generate the colors.
+#' This ensures all colors are distinct by packing the (visible part) of the CIELAB color space
+#' with the needed number of spheres, and using their centers to generate the colors.
 #'
 #' @param n The requested (positive) number of colors.
-#' @param minimal_saturation Exclude colors whose saturation (`hypot(a, b)` in CIE-L*a*b* color space)
-#'                           is less than this value (by default, 33).
-#' @return A list with two elements, `names` containing the color names and `lab` containing a
+#' @param minimal_saturation Exclude colors whose saturation (`hypot(a, b)` in CIELAB color
+#'                           space) is less than this value (by default, 33).
+#' @param minimal_lightness Exclude colors whose lightnes (`l` in CIELAB color space) is less
+#'                          than this value (by default, 20).
+#' @param maximal_lightness Exclude colors whose lightnes (`l` in CIELAB color space) is more
+#'                          than this value (by default, 80).
+#' @return A list with two elements, `name` containing the color names and `lab` containing a
 #'         matrix with a row per color and three columns containing the `l`, `a` and `b` coordinates
 #'         of each color.
 #'
 #' @export
 #'
 #' @examples
-#' chameleon::pick_n_colors(8, 33)
-pick_n_colors <- function(n, minimal_saturation=33) {
+#' chameleon::distinct_colors(8)
+distinct_colors <- function(n, minimal_saturation=33, minimal_lightness=20, maximal_lightness=80) {
+    stopifnot(n > 0)
+
+    stopifnot(minimal_saturation > 0)
+    stopifnot(minimal_saturation < 150)
+
+    stopifnot(minimal_lightness >= 0)
+    stopifnot(minimal_lightness <= maximal_lightness)
+    stopifnot(maximal_lightness <= 100)
+
     too_large_step <- 100
     large_step <- 100
-    large_step_colors <- pick_step_colors(large_step, minimal_saturation)
+    large_step_colors <- pick_step_colors(large_step,
+                                          minimal_saturation,
+                                          minimal_lightness,
+                                          maximal_lightness)
 
     while (is.null(large_step_colors)) {
         too_large_step <- large_step
         large_step <- large_step / 2.0
-        large_step_colors <- pick_step_colors(large_step, minimal_saturation)
+        large_step_colors <- pick_step_colors(large_step,
+                                              minimal_saturation,
+                                              minimal_lightness,
+                                              maximal_lightness)
     }
 
-    if (length(large_step_colors$names) == n) {
+    if (length(large_step_colors$name) == n) {
         return (large_step_colors)
     }
 
-    if (length(large_step_colors$names) > n) {
+    if (length(large_step_colors$name) > n) {
         while (TRUE) {
-            if (length(large_step_colors$names) == 4) {
-                large_step_colors$lab <- head(large_step_colors$lab, n)
-                large_step_colors$names <- head(large_step_colors$names, n)
+            if (length(large_step_colors$name) == 4) {
+                large_step_colors$lab <- utils::head(large_step_colors$lab, n)
+                large_step_colors$name <- utils::head(large_step_colors$name, n)
                 return (large_step_colors)
             }
 
             mid_step <- (too_large_step + large_step) / 2
-            mid_step_colors <- pick_step_colors(mid_step, minimal_saturation)
+            mid_step_colors <- pick_step_colors(mid_step,
+                                                minimal_saturation,
+                                                minimal_saturation,
+                                                maximal_lightness)
 
             if (is.null(mid_step_colors)) {
                 too_large_step <- mid_step
                 next
             }
 
-            if (length(mid_step_colors$names) == n) {
+            if (length(mid_step_colors$name) == n) {
                 return (mid_step_colors)
             }
 
-            if (length(mid_step_colors$names) < n) {
+            if (length(mid_step_colors$name) < n) {
                 large_step <- mid_step
                 large_step_colors <- mid_step_colors
             }
@@ -181,24 +207,36 @@ pick_n_colors <- function(n, minimal_saturation=33) {
         }
     }
 
-    stopifnot(length(large_step_colors$names) < n)
+    stopifnot(length(large_step_colors$name) < n)
 
     small_step <- large_step
     small_step_colors <- large_step_colors
-    while (length(small_step_colors$names) < n) {
+    while (length(small_step_colors$name) < n) {
         small_step <- small_step / 2
-        small_step_colors <- pick_step_colors(small_step, minimal_saturation)
+        small_step_colors <- pick_step_colors(small_step,
+                                              minimal_saturation,
+                                              minimal_lightness,
+                                              maximal_lightness)
         stopifnot(!is.null(small_step_colors))
     }
 
-    stopifnot(length(large_step_colors$names) < n)
-    stopifnot(length(small_step_colors$names) >= n)
+    stopifnot(length(large_step_colors$name) < n)
+    stopifnot(length(small_step_colors$name) >= n)
 
-    while (length(small_step_colors$names) > n) {
+    while (length(small_step_colors$name) > n) {
+        if (large_step - small_step < 1e-6) {
+            small_step_colors$name <- utils::head(small_step_colors$name, n)
+            small_step_colors$lab <- utils::head(small_step_colors$lab, n)
+            break
+        }
+
         mid_step <- (small_step + large_step) / 2
-        mid_step_colors <- pick_step_colors(mid_step, minimal_saturation)
+        mid_step_colors <- pick_step_colors(mid_step,
+                                            minimal_saturation,
+                                            minimal_lightness,
+                                            maximal_lightness)
         stopifnot(!is.null(mid_step_colors))
-        if (length(mid_step_colors$names) >= n) {
+        if (length(mid_step_colors$name) >= n) {
             small_step <- mid_step
             small_step_colors <- mid_step_colors
         } else {
@@ -207,13 +245,13 @@ pick_n_colors <- function(n, minimal_saturation=33) {
         }
     }
 
-    stopifnot(length(small_step_colors$names) == n)
+    stopifnot(length(small_step_colors$name) == n)
     return (small_step_colors)
 }
 
-pick_step_colors <- function(step, minimal_saturation) {
+pick_step_colors <- function(step, minimal_saturation, minimal_lightness, maximal_lightness) {
     lab <- lab_tetragrid(step)
-    srgb <- convertColor(lab, from='Lab', to='sRGB', clip=NA)
+    srgb <- grDevices::convertColor(lab, from='Lab', to='sRGB', clip=NA)
     mask <- !is.nan(rowSums(srgb))
     if (sum(mask) < 4) {
         return (NULL)
@@ -223,7 +261,7 @@ pick_step_colors <- function(step, minimal_saturation) {
     srgb <- srgb[mask,]
 
     saturation <- sqrt(lab[,2] * lab[,2] + lab[,3] * lab[,3])
-    mask <- saturation >= minimal_saturation
+    mask <- (saturation >= minimal_saturation) & (lab[,1] >= minimal_lightness) & (lab[,1] <= maximal_lightness)
     if (sum(mask) < 4) {
         return (NULL)
     }
@@ -231,23 +269,24 @@ pick_step_colors <- function(step, minimal_saturation) {
     lab <- lab[mask,]
     srgb <- srgb[mask,]
 
-    color_names <- as.character(rgb(srgb[,1], srgb[,2], srgb[,3]))
+    color_names <- as.character(grDevices::rgb(srgb[,1], srgb[,2], srgb[,3]))
 
-    return (list(lab=lab, names=color_names))
+    return (list(lab=lab, name=color_names))
 }
 
 lab_tetragrid <- function(step) {
     l_steps <- round(100 / (step * 2 * sqrt(6) / 3))
-    ab_steps<- round(250 / step)
-    grid <- matrix(nrow=(ab_steps + 1) * (ab_steps + 1) * (l_steps + 1), ncol=3)
+    a_steps<- round(250 / (step * 2))
+    b_steps<- round(250 / (step * sqrt(3)))
+    grid <- matrix(nrow=(l_steps + 1) * (a_steps + 1) * (b_steps + 1), ncol=3)
     colnames(grid) <- c('l', 'a', 'b')
     i <- 1
-    for (la in 0:ab_steps) {
-        for (lb in 0:ab_steps) {
-            for (li in 0:l_steps) {
-                grid[i,3] <- step / 2 - 100 + (2 * la + (lb + li) %% 2) * step
-                grid[i,2] <- step / 2 - 150 + (sqrt(3) * (lb + (li %% 2) / 3)) * step
+    for (li in 0:l_steps) {
+        for (la in 0:a_steps) {
+            for (lb in 0:b_steps) {
                 grid[i,1] <- step / 2 + (li * 2 * sqrt(6) / 3) * step
+                grid[i,2] <- step / 2 - 100 + (2 * la + (lb + li) %% 2) * step
+                grid[i,3] <- step / 2 - 150 + (sqrt(3) * (lb + (li %% 2) / 3)) * step
                 i <- i + 1
             }
         }

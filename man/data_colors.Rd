@@ -4,20 +4,34 @@
 \alias{data_colors}
 \title{Compute colors for multi-dimensional data.}
 \usage{
-data_colors(data, umap = TRUE, minimal_saturation = 33, groups = NULL)
+data_colors(
+  data,
+  run_umap = TRUE,
+  groups = NULL,
+  minimal_saturation = 33,
+  minimal_lightness = 20,
+  maximal_lightness = 80
+)
 }
 \arguments{
 \item{data}{A matrix whose rows represent elements/observations and columns represent
 variables/measurements.}
 
-\item{umap}{A boolean specifying whether to run UMAP on the data (by default, `TRUE`). If
-`FALSE`, the data matrix must have exactly 3 columns.}
-
-\item{minimal_saturation}{Exclude colors whose saturation (a^2 + b^2 in CIE-L*a*b* color space)
-is less than this value (by default, 33).}
+\item{run_umap}{A boolean specifying whether to run UMAP on the data to convert it to 3D (by default,
+`TRUE`). If `FALSE`, the data matrix must have exactly 3 columns and will be used
+as-is.}
 
 \item{groups}{An optional array with an entry per row containing the identifier of the group the
 row belongs to.}
+
+\item{minimal_saturation}{Exclude colors whose saturation (`hypot(a, b)` in CIELAB color
+space) is less than this value (by default, 33).}
+
+\item{minimal_lightness}{Exclude colors whose lightnes (`l` in CIELAB color space) is less
+than this value (by default, 20).}
+
+\item{maximal_lightness}{Exclude colors whose lightnes (`l` in CIELAB color space) is more
+than this value (by default, 80).}
 }
 \value{
 An array with one entry per row, whose names are the matrix `rownames`, containing the
@@ -36,15 +50,13 @@ convenient default when investigating unknown data sets. It is not meant to repl
 colors tailored for specific data (e.g. using red colors for "bad" rows and green colors for
 "good" rows).
 
-This ensures all colors are distinct by packing the (visible part) of the CIE-L*a*b* color space
+This ensures all colors are distinct by packing the (visible part) of the CIELAB color space
 with the needed number of spheres. To assign the colors to the data, it uses UMAP to reduce the
 data to 3D. It then uses principal component analysis to represent both the chosen colors (3D
 sphere centers) and the (3D UMAP) data as point clouds with coordinates in the range 0-1, and
 finally uses a stable matching algorithm to map these point clouds to each other, thereby
 assigning a color to each data row. If the data is grouped, then the center of gravity of each
 group is used to generate a color for each group.
-
-By default, "grayscale" colors (with low saturation) are excluded from the result.
 }
 \examples{
 chameleon::data_colors(stackloss)

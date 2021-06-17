@@ -75,7 +75,7 @@
       <h1 data-toc-skip>Coloring multidimensional data</h1>
                         <h4 class="author">Oren Ben-Kiki</h4>
             
-            <h4 class="date">2021-06-16</h4>
+            <h4 class="date">2021-06-17</h4>
       
       
       <div class="hidden name"><code>examples.Rmd</code></div>
@@ -89,10 +89,6 @@
 <a href="#the-problem" class="anchor"></a>The Problem</h2>
 <p>Suppose we have some data containing multiple variable values (measurements) for a number of elements (observations). We’d like to visualize this data, and when doing so, assign different colors to different elements.</p>
 <p>This requires us to manually assign a color to each element, or if the data lends itself to it, compute some linear score for each element and use that as an index into a color palette. For large multidimensional data, neither approach is practical.</p>
-</div>
-<div id="the-provided-solution" class="section level2">
-<h2 class="hasAnchor">
-<a href="#the-provided-solution" class="anchor"></a>The Provided Solution</h2>
 <p>The <code>chameleon</code> package provides a quick-and-dirty solution which automatically computes a distinct color to each data element, where these colors try to reflect the “coarse” structure of the data; that is, “more similar” data elements are assigned “more similar” colors.</p>
 </div>
 <div id="seatbelts-example" class="section level2">
@@ -118,7 +114,7 @@
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tkonopka/umap">umap</a></span><span class="op">)</span>
 <span class="va">layout</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/umap/man/umap.html">umap</a></span><span class="op">(</span><span class="va">seatbelts</span>, min_dist<span class="op">=</span><span class="fl">0.99</span>, random_state<span class="op">=</span><span class="fl">123456</span><span class="op">)</span><span class="op">$</span><span class="va">layout</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">layout</span>, col<span class="op">=</span><span class="va">colors</span>, pch<span class="op">=</span><span class="fl">19</span>, cex<span class="op">=</span><span class="fl">2.5</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">layout</span>, asp<span class="op">=</span><span class="fl">1</span>, col<span class="op">=</span><span class="va">colors</span>, pch<span class="op">=</span><span class="fl">19</span>, cex<span class="op">=</span><span class="fl">1</span><span class="op">)</span></code></pre></div>
 <p><img src="examples_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 <p>Assuming that UMAP has indeed captured some underlying structure of the data, we can see that the chosen colors correspond well to this structure, and possibly hint at some additional structure not captured well in the 2D projection.</p>
 <p>However, 192 colors is “a bit much”, so we can’t expect them to be very distinct from each other. We can reduce the number of colors by grouping the data elements.</p>
@@ -132,8 +128,8 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">year_colors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_colors.html">data_colors</a></span><span class="op">(</span><span class="va">seatbelts</span>, group<span class="op">=</span><span class="va">years</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">layout</span>, col<span class="op">=</span><span class="va">year_colors</span><span class="op">[</span><span class="va">years</span><span class="op">]</span>, pch<span class="op">=</span><span class="fl">19</span>, cex<span class="op">=</span><span class="fl">2.5</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/legend.html">legend</a></span><span class="op">(</span><span class="st">'bottomleft'</span>, legend<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">year_colors</span><span class="op">)</span>, col<span class="op">=</span><span class="va">year_colors</span>, lty<span class="op">=</span><span class="fl">1</span>, lwd<span class="op">=</span><span class="fl">3</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">layout</span>, asp<span class="op">=</span><span class="fl">1</span>, col<span class="op">=</span><span class="va">year_colors</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="va">years</span><span class="op">)</span><span class="op">]</span>, pch<span class="op">=</span><span class="fl">19</span>, cex<span class="op">=</span><span class="fl">1</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/legend.html">legend</a></span><span class="op">(</span><span class="st">'bottomleft'</span>, legend<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">year_colors</span><span class="op">)</span>, col<span class="op">=</span><span class="va">year_colors</span>, lty<span class="op">=</span><span class="fl">1</span>, lwd<span class="op">=</span><span class="fl">3</span>, cex<span class="op">=</span><span class="fl">0.75</span><span class="op">)</span></code></pre></div>
 <p><img src="examples_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>We see each year’s data is spread over a large part of the projection, but not uniformly so, suggesting that while there is some year-to-year variation, it probably isn’t the right way to group this data into distinct clusters.</p>
 </div>
@@ -142,18 +138,46 @@
 <a href="#pbmc-example" class="anchor"></a>PBMC Example</h2>
 <p>For a more successful grouping example, we’ll use some single-cell RNA sequence (sc-RNA) data (provided as part of the <code>chameleon</code> package). This data contains a <code>umis</code> matrix, containing ~1.5K metacells (rows), and for each one, the UMI count (# of detected RNA molecules) for each of ~600 different “feature” genes (columns). In addition, it provides a vector of cell <code>types</code> which were assigned to the metacells using a supervised analysis pipeline, and a <code>umap</code> 2-column matrix containing the 2D UMAP projection chosen to visualize the data (a common practice for scRNA data analysis).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">'pbmc'</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span></code></pre></div>
 <p>Let’s compute a color for each cell type. For better results, we first convert the raw UMI counts to a log of the fraction of of the total UMIs in each metacell:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fractions</span> <span class="op">&lt;-</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">umis</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">umis</span><span class="op">)</span>
 <span class="va">log_fractions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log2</a></span><span class="op">(</span><span class="va">fractions</span> <span class="op">+</span> <span class="fl">1e-5</span><span class="op">)</span>
 <span class="va">type_colors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_colors.html">data_colors</a></span><span class="op">(</span><span class="va">log_fractions</span>, group<span class="op">=</span><span class="va">pbmc</span><span class="op">$</span><span class="va">types</span><span class="op">)</span></code></pre></div>
-<p>We can then use this to color the provided 2D UMAP projection:</p>
+<p>We can then use this to color the provided 2D UMAP projection. Here we’ll use <code>ggplot2</code>:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">umap</span>, col<span class="op">=</span><span class="va">type_colors</span><span class="op">[</span><span class="va">pbmc</span><span class="op">$</span><span class="va">types</span><span class="op">]</span>, pch<span class="op">=</span><span class="fl">19</span>, cex<span class="op">=</span><span class="fl">0.6</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/legend.html">legend</a></span><span class="op">(</span><span class="st">'topleft'</span>, legend<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">type_colors</span><span class="op">)</span>, col<span class="op">=</span><span class="va">type_colors</span>, lty<span class="op">=</span><span class="fl">1</span>, lwd<span class="op">=</span><span class="fl">3</span>, cex<span class="op">=</span><span class="fl">0.8</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="va">frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">umap</span><span class="op">)</span>
+<span class="va">frame</span><span class="op">$</span><span class="va">type</span> <span class="op">&lt;-</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">types</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">frame</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">xs</span>, y<span class="op">=</span><span class="va">ys</span>, color<span class="op">=</span><span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span><span class="op">(</span>values<span class="op">=</span><span class="va">type_colors</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.text<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">12</span><span class="op">)</span>, legend.key.height<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">14</span>, <span class="st">'pt'</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; Warning: Removed 39 rows containing missing values (geom_point).</span></code></pre></div>
 <p><img src="examples_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <p>Here we see that, in contrast to the seatbelt years case above, each type (group of metacells) maps to a distinct region in the 2D UMAP projection, suggesting that grouping the metacells by the type annotations does capture some significant structure of the data.</p>
+</div>
+<div id="picking-distinct-colors" class="section level2">
+<h2 class="hasAnchor">
+<a href="#picking-distinct-colors" class="anchor"></a>Picking distinct colors</h2>
+<p>The <code>chameleon</code> package also provides the lower-lever function <code>distinct_colors</code> which attempts to select a number of distinct colors, which can be directly assigned to unordered categorical data. For example:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/distinct_colors.html">distinct_colors</a></span><span class="op">(</span><span class="fl">8</span><span class="op">)</span>
+<span class="co">#&gt; $lab</span>
+<span class="co">#&gt;             l         a          b</span>
+<span class="co">#&gt; [1,] 45.31069  16.83526 -53.526963</span>
+<span class="co">#&gt; [2,] 45.31069  59.32081 -53.526963</span>
+<span class="co">#&gt; [3,] 45.31069  38.07803 -16.733398</span>
+<span class="co">#&gt; [4,] 45.31069  59.32081  20.060166</span>
+<span class="co">#&gt; [5,] 80.00000 -68.13584  44.589209</span>
+<span class="co">#&gt; [6,] 80.00000 -25.65029 -28.997920</span>
+<span class="co">#&gt; [7,] 80.00000 -46.89306   7.795645</span>
+<span class="co">#&gt; [8,] 80.00000 -25.65029  44.589209</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $name</span>
+<span class="co">#&gt; [1] "#3E67C5" "#9C3FC6" "#9B5188" "#C6314D" "#30E36E" "#4DD6FB" "#51DDB6"</span>
+<span class="co">#&gt; [8] "#B3D270"</span></code></pre></div>
+<p>By default, this excludes low-saturation colors (with a low <code>hypot(a, b)</code> value in the CIELAB color space), as well as too-dark and too-light colors (with too-low or too-high <code>l</code> value in the CIELAB color space). This can be controlled by specifying explicit <code>minimal_saturation</code>, <code>minimal_lightness</code> and <code>maximal_lightness</code> parameters.</p>
 </div>
   </div>
 

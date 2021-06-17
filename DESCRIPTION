@@ -1,6 +1,6 @@
 Package: chameleon
 Version: 0.1-0
-Date: 2021-06-16
+Date: 2021-06-17
 Title: Automatic colors for multi-dimensional data
 Description: Assign distinct colors to arbitrary multi-dimensional data, considering its structure.
 Authors@R: c(
@@ -10,7 +10,7 @@ Authors@R: c(
 RoxygenNote: 7.0.2
 Encoding: UTF-8
 License: MIT + file LICENSE
-Imports: clue, umap
+Imports: clue, grDevices, stats, umap
 LazyData: true
-Suggests: knitr, rmarkdown
-VignetteBuilder: knitr
+Suggests: ggplot2, knitr, rmarkdown
+VignetteBuilder: ggplot2, knitr

@@ -1,10 +1,10 @@
 ---
 title: Coloring multidimensional data
 author: Oren Ben-Kiki
-date: 2021-06-16
+date: 2021-06-17
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{seatbelts}
+  %\VignetteIndexEntry{examples}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -22,8 +22,6 @@ colors to different elements.
 This requires us to manually assign a color to each element, or if the data lends itself to it,
 compute some linear score for each element and use that as an index into a color palette. For large
 multidimensional data, neither approach is practical.
-
-## The Provided Solution
 
 The `chameleon` package provides a quick-and-dirty solution which automatically computes a distinct
 color to each data element, where these colors try to reflect the "coarse" structure of the data;
@@ -53,7 +51,7 @@ colors <- data_colors(seatbelts)
 library(umap)
 layout <- umap(seatbelts, min_dist=0.99, random_state=123456)$layout
 
-plot(layout, col=colors, pch=19, cex=2.5)
+plot(layout, asp=1, col=colors, pch=19, cex=1)
 ```
 
 Assuming that UMAP has indeed captured some underlying structure of the data, we can see that the
@@ -76,8 +74,8 @@ And then compute and show a color for each year:
 ```{r, fig.show='hold'}
 year_colors <- data_colors(seatbelts, group=years)
 
-plot(layout, col=year_colors[years], pch=19, cex=2.5)
-legend('bottomleft', legend=names(year_colors), col=year_colors, lty=1, lwd=3)
+plot(layout, asp=1, col=year_colors[as.character(years)], pch=19, cex=1)
+legend('bottomleft', legend=names(year_colors), col=year_colors, lty=1, lwd=3, cex=0.75)
 ```
 
 We see each year's data is spread over a large part of the projection, but not uniformly so,
@@ -96,7 +94,7 @@ analysis).
 
 
 ```{r}
-data('pbmc')
+data(pbmc)
 ```
 
 Let's compute a color for each cell type. For better results, we first convert the raw UMI counts to
@@ -108,13 +106,33 @@ log_fractions <- log2(fractions + 1e-5)
 type_colors <- data_colors(log_fractions, group=pbmc$types)
 ```
 
-We can then use this to color the provided 2D UMAP projection:
+We can then use this to color the provided 2D UMAP projection. Here we'll use `ggplot2`:
 
 ```{r, fig.show='hold'}
-plot(pbmc$umap, col=type_colors[pbmc$types], pch=19, cex=0.6)
-legend('topleft', legend=names(type_colors), col=type_colors, lty=1, lwd=3, cex=0.8)
+library(ggplot2)
+frame <- as.data.frame(pbmc$umap)
+frame$type <- pbmc$types
+ggplot(frame, aes(x=xs, y=ys, color=type)) +
+    geom_point(size=0.75) +
+    scale_color_manual(values=type_colors) +
+    theme(legend.text=element_text(size=12), legend.key.height=unit(14, 'pt'))
 ```
 
 Here we see that, in contrast to the seatbelt years case above, each type (group of metacells) maps
 to a distinct region in the 2D UMAP projection, suggesting that grouping the metacells by the type
 annotations does capture some significant structure of the data.
+
+## Picking distinct colors
+
+The `chameleon` package also provides the lower-lever function `distinct_colors` which attempts to
+select a number of distinct colors, which can be directly assigned to unordered categorical data.
+For example:
+
+```{r}
+distinct_colors(8)
+```
+
+By default, this excludes low-saturation colors (with a low `hypot(a, b)` value in the CIELAB color
+space), as well as too-dark and too-light colors (with too-low or too-high `l` value in the CIELAB
+color space). This can be controlled by specifying explicit `minimal_saturation`,
+`minimal_lightness` and `maximal_lightness` parameters.
