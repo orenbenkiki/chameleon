@@ -2,3 +2,5 @@
 
 export(data_colors)
 export(distinct_colors)
+export(scale_color_chameleon)
+export(scale_fill_chameleon)

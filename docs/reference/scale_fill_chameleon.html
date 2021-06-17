@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Pick a number of distinct colors. — distinct_colors • chameleon</title>
+<title>Setup a fill scale of distinct discrete colors in ggplot2. — scale_fill_chameleon • chameleon</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,12 @@
 
 
 
-<meta property="og:title" content="Pick a number of distinct colors. — distinct_colors" />
-<meta property="og:description" content="This ensures all colors are distinct by packing the (visible part) of the CIELAB color space
-with the needed number of spheres, and using their centers to generate the colors." />
+<meta property="og:title" content="Setup a fill scale of distinct discrete colors in ggplot2. — scale_fill_chameleon" />
+<meta property="og:description" content="This is a thin wrapper to ggplot2::discrete_scale('fill', 'chameleon', ...), which uses
+the colors chosen by invoking distinct_colors. The order of the colors is arbitrary. If
+the data has some structure the colors should reflect, use one of the many palettes available in
+R, or using data_colors for automatically matching the colors to the structure of
+multi-dimensional data." />
 
 
 
@@ -116,30 +119,29 @@ with the needed number of spheres, and using their centers to generate the color
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Pick a number of distinct colors.</h1>
+    <h1>Setup a fill scale of distinct discrete colors in ggplot2.</h1>
     
-    <div class="hidden name"><code>distinct_colors.Rd</code></div>
+    <div class="hidden name"><code>scale_fill_chameleon.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This ensures all colors are distinct by packing the (visible part) of the CIELAB color space
-with the needed number of spheres, and using their centers to generate the colors.</p>
+    <p>This is a thin wrapper to <code><a href='https://ggplot2.tidyverse.org/reference/discrete_scale.html'>ggplot2::discrete_scale('fill', 'chameleon', ...)</a></code>, which uses
+the colors chosen by invoking <code>distinct_colors</code>. The order of the colors is arbitrary. If
+the data has some structure the colors should reflect, use one of the many palettes available in
+R, or using <code>data_colors</code> for automatically matching the colors to the structure of
+multi-dimensional data.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>distinct_colors</span><span class='op'>(</span>
-  <span class='va'>n</span>,
+    <pre class="usage"><span class='fu'>scale_fill_chameleon</span><span class='op'>(</span>
   minimal_saturation <span class='op'>=</span> <span class='fl'>33</span>,
   minimal_lightness <span class='op'>=</span> <span class='fl'>20</span>,
-  maximal_lightness <span class='op'>=</span> <span class='fl'>80</span>
+  maximal_lightness <span class='op'>=</span> <span class='fl'>80</span>,
+  <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>n</th>
-      <td><p>The requested (positive) number of colors.</p></td>
-    </tr>
     <tr>
       <th>minimal_saturation</th>
       <td><p>Exclude colors whose saturation (<code>hypot(a, b)</code> in CIELAB color
@@ -155,31 +157,23 @@ than this value (by default, 20).</p></td>
       <td><p>Exclude colors whose lightnes (<code>l</code> in CIELAB color space) is more
 than this value (by default, 80).</p></td>
     </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Additional parameters for <code>discrete_scale</code>.</p></td>
+    </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A list with two elements, <code>name</code> containing the color names and <code>lab</code>
-        containing a matrix with a row per color and three columns containing the <code>l</code>,
-        <code>a</code> and <code>b</code> coordinates of each color.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>chameleon</span><span class='fu'>::</span><span class='fu'>distinct_colors</span><span class='op'>(</span><span class='fl'>8</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $lab
-#&gt;             l         a          b
-#&gt; [1,] 45.31069  16.83526 -53.526963
-#&gt; [2,] 45.31069  59.32081 -53.526963
-#&gt; [3,] 45.31069  38.07803 -16.733398
-#&gt; [4,] 45.31069  59.32081  20.060166
-#&gt; [5,] 80.00000 -68.13584  44.589209
-#&gt; [6,] 80.00000 -25.65029 -28.997920
-#&gt; [7,] 80.00000 -46.89306   7.795645
-#&gt; [8,] 80.00000 -25.65029  44.589209
-#&gt; 
-#&gt; $name
-#&gt; [1] "#3E67C5" "#9C3FC6" "#9B5188" "#C6314D" "#30E36E" "#4DD6FB" "#51DDB6"
-#&gt; [8] "#B3D270"
-#&gt; </div></pre>
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>pbmc</span><span class='op'>)</span>
+<span class='va'>frame</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span><span class='op'>(</span><span class='va'>pbmc</span><span class='op'>$</span><span class='va'>umap</span><span class='op'>)</span>
+<span class='va'>frame</span><span class='op'>$</span><span class='va'>type</span> <span class='op'>&lt;-</span> <span class='va'>pbmc</span><span class='op'>$</span><span class='va'>types</span>
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='va'>frame</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x<span class='op'>=</span><span class='va'>xs</span>, y<span class='op'>=</span><span class='va'>ys</span>, fill<span class='op'>=</span><span class='va'>type</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span><span class='op'>(</span>size<span class='op'>=</span><span class='fl'>0.75</span>, shape<span class='op'>=</span><span class='fl'>21</span>, color<span class='op'>=</span><span class='st'>"black"</span>, stroke<span class='op'>=</span><span class='fl'>0.1</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'>scale_fill_chameleon</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>legend.text<span class='op'>=</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>size<span class='op'>=</span><span class='fl'>12</span><span class='op'>)</span>, legend.key.height<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/grid/unit.html'>unit</a></span><span class='op'>(</span><span class='fl'>14</span>, <span class='st'>'pt'</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 39 rows containing missing values (geom_point).</span></div><div class='img'><img src='scale_fill_chameleon-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

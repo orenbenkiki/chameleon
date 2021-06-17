@@ -89,12 +89,12 @@
 <a href="#the-problem" class="anchor"></a>The Problem</h2>
 <p>Suppose we have some data containing multiple variable values (measurements) for a number of elements (observations). We’d like to visualize this data, and when doing so, assign different colors to different elements.</p>
 <p>This requires us to manually assign a color to each element, or if the data lends itself to it, compute some linear score for each element and use that as an index into a color palette. For large multidimensional data, neither approach is practical.</p>
-<p>The <code>chameleon</code> package provides a quick-and-dirty solution which automatically computes a distinct color to each data element, where these colors try to reflect the “coarse” structure of the data; that is, “more similar” data elements are assigned “more similar” colors.</p>
+<p>The  package provides a quick-and-dirty solution which automatically computes a distinct color to each data element, where these colors try to reflect the “coarse” structure of the data; that is, “more similar” data elements are assigned “more similar” colors.</p>
 </div>
 <div id="seatbelts-example" class="section level2">
 <h2 class="hasAnchor">
 <a href="#seatbelts-example" class="anchor"></a>Seatbelts Example</h2>
-<p>We’ll demonstrate this on the seatbelt data, one of the built-in data sets provided by R. To begin, we’ll load the <code>chameleon</code> package and access the seatbelts data. Since the package only works on simple matrices, we’ll have to convert the seatbelts time series data to a simple matrix:</p>
+<p>We’ll demonstrate this on the seatbelt data, one of the built-in data sets provided by R. To begin, we’ll load the  package and access the seatbelts data. Since the package only works on simple matrices, we’ll have to convert the seatbelts time series data to a simple matrix:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">chameleon</span><span class="op">)</span>
 <span class="va">seatbelts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">Seatbelts</span><span class="op">)</span>, nrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Seatbelts</span><span class="op">)</span>, ncol<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">Seatbelts</span><span class="op">)</span><span class="op">)</span>
@@ -107,7 +107,7 @@
 <span class="co">#&gt; [2,]            97    1508   825  265  7685   0.1023630         6   0</span>
 <span class="co">#&gt; [3,]           102    1507   806  319  9963   0.1020625        12   0</span>
 <span class="co">#&gt; [4,]            87    1385   814  407 10955   0.1008733         8   0</span></code></pre></div>
-<p>We now have a matrix with 192 elements and 8 measurements for each one. Using the <code>data_colors</code> function, we can assign a color to each element and use it to visualize the data, for example using a 3D UMAP projection:</p>
+<p>We now have a matrix with 192 elements and 8 measurements for each one. Using the  function, we can assign a color to each element and use it to visualize the data, for example using a 3D UMAP projection:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">colors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_colors.html">data_colors</a></span><span class="op">(</span><span class="va">seatbelts</span><span class="op">)</span>
 
@@ -136,7 +136,7 @@
 <div id="pbmc-example" class="section level2">
 <h2 class="hasAnchor">
 <a href="#pbmc-example" class="anchor"></a>PBMC Example</h2>
-<p>For a more successful grouping example, we’ll use some single-cell RNA sequence (sc-RNA) data (provided as part of the <code>chameleon</code> package). This data contains a <code>umis</code> matrix, containing ~1.5K metacells (rows), and for each one, the UMI count (# of detected RNA molecules) for each of ~600 different “feature” genes (columns). In addition, it provides a vector of cell <code>types</code> which were assigned to the metacells using a supervised analysis pipeline, and a <code>umap</code> 2-column matrix containing the 2D UMAP projection chosen to visualize the data (a common practice for scRNA data analysis).</p>
+<p>For a more successful grouping example, we’ll use some single-cell RNA sequence (sc-RNA) data (provided as part of the  package). This data contains a  matrix, containing ~1.5K metacells (rows), and for each one, the UMI count (# of detected RNA molecules) for each of ~600 different “feature” genes (columns). In addition, it provides a vector of cell  which were assigned to the metacells using a supervised analysis pipeline, and a  2-column matrix containing the 2D UMAP projection chosen to visualize the data (a common practice for scRNA data analysis).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span></code></pre></div>
 <p>Let’s compute a color for each cell type. For better results, we first convert the raw UMI counts to a log of the fraction of of the total UMIs in each metacell:</p>
@@ -144,7 +144,7 @@
 <code class="sourceCode R"><span class="va">fractions</span> <span class="op">&lt;-</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">umis</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">umis</span><span class="op">)</span>
 <span class="va">log_fractions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log2</a></span><span class="op">(</span><span class="va">fractions</span> <span class="op">+</span> <span class="fl">1e-5</span><span class="op">)</span>
 <span class="va">type_colors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_colors.html">data_colors</a></span><span class="op">(</span><span class="va">log_fractions</span>, group<span class="op">=</span><span class="va">pbmc</span><span class="op">$</span><span class="va">types</span><span class="op">)</span></code></pre></div>
-<p>We can then use this to color the provided 2D UMAP projection. Here we’ll use <code>ggplot2</code>:</p>
+<p>We can then use this to color the provided 2D UMAP projection. Here we’ll use :</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 <span class="va">frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">umap</span><span class="op">)</span>
@@ -160,7 +160,7 @@
 <div id="picking-distinct-colors" class="section level2">
 <h2 class="hasAnchor">
 <a href="#picking-distinct-colors" class="anchor"></a>Picking distinct colors</h2>
-<p>The <code>chameleon</code> package also provides the lower-lever function <code>distinct_colors</code> which attempts to select a number of distinct colors, which can be directly assigned to unordered categorical data. For example:</p>
+<p>The  package also provides the lower-lever function  which attempts to select a number of distinct colors, which can be directly assigned to unordered categorical data. For example:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/distinct_colors.html">distinct_colors</a></span><span class="op">(</span><span class="fl">8</span><span class="op">)</span>
 <span class="co">#&gt; $lab</span>
@@ -177,7 +177,24 @@
 <span class="co">#&gt; $name</span>
 <span class="co">#&gt; [1] "#3E67C5" "#9C3FC6" "#9B5188" "#C6314D" "#30E36E" "#4DD6FB" "#51DDB6"</span>
 <span class="co">#&gt; [8] "#B3D270"</span></code></pre></div>
-<p>By default, this excludes low-saturation colors (with a low <code>hypot(a, b)</code> value in the CIELAB color space), as well as too-dark and too-light colors (with too-low or too-high <code>l</code> value in the CIELAB color space). This can be controlled by specifying explicit <code>minimal_saturation</code>, <code>minimal_lightness</code> and <code>maximal_lightness</code> parameters.</p>
+<p>By default, this excludes low-saturation colors (with a low  value in the CIELAB color space), as well as too-dark and too-light colors (with too-low or too-high  value in the CIELAB color space). This can be controlled by specifying explicit ,  and  parameters.</p>
+<p>The  convenience function wraps this to allow it to be used this as a  color scale for unordered (categorical) data. For example:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">frame</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">xs</span>, y<span class="op">=</span><span class="va">ys</span>, color<span class="op">=</span><span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="../reference/scale_color_chameleon.html">scale_color_chameleon</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.text<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">12</span><span class="op">)</span>, legend.key.height<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">14</span>, <span class="st">'pt'</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; Warning: Removed 39 rows containing missing values (geom_point).</span></code></pre></div>
+<p><img src="examples_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<p>And the similar  function allows it to be used for  fill colors:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">frame</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">xs</span>, y<span class="op">=</span><span class="va">ys</span>, fill<span class="op">=</span><span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">0.75</span>, shape<span class="op">=</span><span class="fl">21</span>, color<span class="op">=</span><span class="st">"black"</span>, stroke<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span>
+     <span class="fu"><a href="../reference/scale_fill_chameleon.html">scale_fill_chameleon</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.text<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">12</span><span class="op">)</span>, legend.key.height<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">14</span>, <span class="st">'pt'</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; Warning: Removed 39 rows containing missing values (geom_point).</span></code></pre></div>
+<p><img src="examples_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p>Using any of these functions arbitrarily maps the colors to the values, making no attempt to have similar colors reflect similarities in the underlying data.</p>
 </div>
   </div>
 

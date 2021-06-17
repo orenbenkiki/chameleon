@@ -14,19 +14,19 @@ distinct_colors(
 \arguments{
 \item{n}{The requested (positive) number of colors.}
 
-\item{minimal_saturation}{Exclude colors whose saturation (`hypot(a, b)` in CIELAB color
+\item{minimal_saturation}{Exclude colors whose saturation (\code{hypot(a, b)} in CIELAB color
 space) is less than this value (by default, 33).}
 
-\item{minimal_lightness}{Exclude colors whose lightnes (`l` in CIELAB color space) is less
+\item{minimal_lightness}{Exclude colors whose lightnes (\code{l} in CIELAB color space) is less
 than this value (by default, 20).}
 
-\item{maximal_lightness}{Exclude colors whose lightnes (`l` in CIELAB color space) is more
+\item{maximal_lightness}{Exclude colors whose lightnes (\code{l} in CIELAB color space) is more
 than this value (by default, 80).}
 }
 \value{
-A list with two elements, `name` containing the color names and `lab` containing a
-        matrix with a row per color and three columns containing the `l`, `a` and `b` coordinates
-        of each color.
+A list with two elements, \code{name} containing the color names and \code{lab}
+        containing a matrix with a row per color and three columns containing the \code{l},
+        \code{a} and \code{b} coordinates of each color.
 }
 \description{
 This ensures all colors are distinct by packing the (visible part) of the CIELAB color space

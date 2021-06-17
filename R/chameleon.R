@@ -22,18 +22,18 @@
 #' @param groups An optional array with an entry per row containing the identifier of the group the
 #'               row belongs to.
 #' @param run_umap A boolean specifying whether to run UMAP on the data to convert it to 3D (by default,
-#'                 `TRUE`). If `FALSE`, the data matrix must have exactly 3 columns and will be used
-#'                 as-is.
-#' @param minimal_saturation Exclude colors whose saturation (`hypot(a, b)` in CIELAB color
+#'                 \code{TRUE}). If \code{FALSE}, the data matrix must have exactly 3 columns and
+#'                 will be used as-is.
+#' @param minimal_saturation Exclude colors whose saturation (\code{hypot(a, b)} in CIELAB color
 #'                           space) is less than this value (by default, 33).
-#' @param minimal_lightness Exclude colors whose lightnes (`l` in CIELAB color space) is less
+#' @param minimal_lightness Exclude colors whose lightnes (\code{l} in CIELAB color space) is less
 #'                          than this value (by default, 20).
-#' @param maximal_lightness Exclude colors whose lightnes (`l` in CIELAB color space) is more
+#' @param maximal_lightness Exclude colors whose lightnes (\code{l} in CIELAB color space) is more
 #'                          than this value (by default, 80).
-#' @return An array with one entry per row, whose names are the matrix `rownames`, containing the
-#'         color of each row. If `groups` was specified, the array will contain one entry per
-#'         unique group identifier, whose names are the `as.character` group identifiers, containing
-#'         the color of each group.
+#' @return An array with one entry per row, whose names are the matrix \code{rownames}, containing the
+#'         color of each row. If \code{groups} was specified, the array will contain one entry per
+#'         unique group identifier, whose names are the \code{as.character} group identifiers,
+#'         containing the color of each group.
 #'
 #' @export
 #'
@@ -130,15 +130,15 @@ datum_distance <- function(x, y, z, u, v, w) {
 #' with the needed number of spheres, and using their centers to generate the colors.
 #'
 #' @param n The requested (positive) number of colors.
-#' @param minimal_saturation Exclude colors whose saturation (`hypot(a, b)` in CIELAB color
+#' @param minimal_saturation Exclude colors whose saturation (\code{hypot(a, b)} in CIELAB color
 #'                           space) is less than this value (by default, 33).
-#' @param minimal_lightness Exclude colors whose lightnes (`l` in CIELAB color space) is less
+#' @param minimal_lightness Exclude colors whose lightnes (\code{l} in CIELAB color space) is less
 #'                          than this value (by default, 20).
-#' @param maximal_lightness Exclude colors whose lightnes (`l` in CIELAB color space) is more
+#' @param maximal_lightness Exclude colors whose lightnes (\code{l} in CIELAB color space) is more
 #'                          than this value (by default, 80).
-#' @return A list with two elements, `name` containing the color names and `lab` containing a
-#'         matrix with a row per color and three columns containing the `l`, `a` and `b` coordinates
-#'         of each color.
+#' @return A list with two elements, \code{name} containing the color names and \code{lab}
+#'         containing a matrix with a row per color and three columns containing the \code{l},
+#'         \code{a} and \code{b} coordinates of each color.
 #'
 #' @export
 #'
@@ -293,4 +293,62 @@ lab_tetragrid <- function(step) {
     }
 
     return(grid)
+}
+
+#' Setup a color scale of distinct discrete colors in ggplot2.
+#'
+#' This is a thin wrapper to \code{ggplot2::discrete_scale('colour', 'chameleon', ...)}, which uses
+#' the colors chosen by invoking \code{distinct_colors}. The order of the colors is arbitrary. If
+#' the data has some structure the colors should reflect, use one of the many palettes available in
+#' R, or using \code{data_colors} for automatically matching the colors to the structure of
+#' multi-dimensional data.
+#'
+#' @param ... Additional parameters for \code{discrete_scale}.
+#'
+#' @inheritParams distinct_colors
+#'
+#' @examples
+#' library(ggplot2)
+#' data(pbmc)
+#' frame <- as.data.frame(pbmc$umap)
+#' frame$type <- pbmc$types
+#' ggplot(frame, aes(x=xs, y=ys, color=type)) +
+#'     geom_point(size=0.75) +
+#'     scale_color_chameleon() +
+#'     theme(legend.text=element_text(size=12), legend.key.height=unit(14, 'pt'))
+#' @export
+scale_color_chameleon <- function(minimal_saturation = 33, minimal_lightness = 20, maximal_lightness = 80, ...) {
+    color_func <- function(n) distinct_colors(n, minimal_saturation = minimal_saturation,
+                                              minimal_lightness = minimal_lightness,
+                                              maximal_lightness = maximal_lightness)$name
+    ggplot2::discrete_scale('colour', 'chameleon', color_func, ...)
+}
+
+#' Setup a fill scale of distinct discrete colors in ggplot2.
+#'
+#' This is a thin wrapper to \code{ggplot2::discrete_scale('fill', 'chameleon', ...)}, which uses
+#' the colors chosen by invoking \code{distinct_colors}. The order of the colors is arbitrary. If
+#' the data has some structure the colors should reflect, use one of the many palettes available in
+#' R, or using \code{data_colors} for automatically matching the colors to the structure of
+#' multi-dimensional data.
+#'
+#' @param ... Additional parameters for \code{discrete_scale}.
+#'
+#' @inheritParams distinct_colors
+#'
+#' @examples
+#' library(ggplot2)
+#' data(pbmc)
+#' frame <- as.data.frame(pbmc$umap)
+#' frame$type <- pbmc$types
+#' ggplot(frame, aes(x=xs, y=ys, fill=type)) +
+#'     geom_point(size=0.75, shape=21, color="black", stroke=0.1) +
+#'     scale_fill_chameleon() +
+#'     theme(legend.text=element_text(size=12), legend.key.height=unit(14, 'pt'))
+#' @export
+scale_fill_chameleon <- function(minimal_saturation = 33, minimal_lightness = 20, maximal_lightness = 80, ...) {
+    color_func <- function(n) distinct_colors(n, minimal_saturation = minimal_saturation,
+                                              minimal_lightness = minimal_lightness,
+                                              maximal_lightness = maximal_lightness)$name
+    ggplot2::discrete_scale('fill', 'chameleon', color_func, ...)
 }

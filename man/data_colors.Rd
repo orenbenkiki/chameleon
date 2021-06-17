@@ -18,26 +18,26 @@ data_colors(
 variables/measurements.}
 
 \item{run_umap}{A boolean specifying whether to run UMAP on the data to convert it to 3D (by default,
-`TRUE`). If `FALSE`, the data matrix must have exactly 3 columns and will be used
-as-is.}
+\code{TRUE}). If \code{FALSE}, the data matrix must have exactly 3 columns and
+will be used as-is.}
 
 \item{groups}{An optional array with an entry per row containing the identifier of the group the
 row belongs to.}
 
-\item{minimal_saturation}{Exclude colors whose saturation (`hypot(a, b)` in CIELAB color
+\item{minimal_saturation}{Exclude colors whose saturation (\code{hypot(a, b)} in CIELAB color
 space) is less than this value (by default, 33).}
 
-\item{minimal_lightness}{Exclude colors whose lightnes (`l` in CIELAB color space) is less
+\item{minimal_lightness}{Exclude colors whose lightnes (\code{l} in CIELAB color space) is less
 than this value (by default, 20).}
 
-\item{maximal_lightness}{Exclude colors whose lightnes (`l` in CIELAB color space) is more
+\item{maximal_lightness}{Exclude colors whose lightnes (\code{l} in CIELAB color space) is more
 than this value (by default, 80).}
 }
 \value{
-An array with one entry per row, whose names are the matrix `rownames`, containing the
-        color of each row. If `groups` was specified, the array will contain one entry per
-        unique group identifier, whose names are the `as.character` group identifiers, containing
-        the color of each group.
+An array with one entry per row, whose names are the matrix \code{rownames}, containing the
+        color of each row. If \code{groups} was specified, the array will contain one entry per
+        unique group identifier, whose names are the \code{as.character} group identifiers,
+        containing the color of each group.
 }
 \description{
 Given a matrix of observation/element rows and variable/measurement columns, compute a color for

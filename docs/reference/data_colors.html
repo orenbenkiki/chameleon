@@ -148,8 +148,8 @@ variables/measurements.</p></td>
     <tr>
       <th>run_umap</th>
       <td><p>A boolean specifying whether to run UMAP on the data to convert it to 3D (by default,
-`TRUE`). If `FALSE`, the data matrix must have exactly 3 columns and will be used
-as-is.</p></td>
+<code>TRUE</code>). If <code>FALSE</code>, the data matrix must have exactly 3 columns and
+will be used as-is.</p></td>
     </tr>
     <tr>
       <th>groups</th>
@@ -158,27 +158,27 @@ row belongs to.</p></td>
     </tr>
     <tr>
       <th>minimal_saturation</th>
-      <td><p>Exclude colors whose saturation (`hypot(a, b)` in CIELAB color
+      <td><p>Exclude colors whose saturation (<code>hypot(a, b)</code> in CIELAB color
 space) is less than this value (by default, 33).</p></td>
     </tr>
     <tr>
       <th>minimal_lightness</th>
-      <td><p>Exclude colors whose lightnes (`l` in CIELAB color space) is less
+      <td><p>Exclude colors whose lightnes (<code>l</code> in CIELAB color space) is less
 than this value (by default, 20).</p></td>
     </tr>
     <tr>
       <th>maximal_lightness</th>
-      <td><p>Exclude colors whose lightnes (`l` in CIELAB color space) is more
+      <td><p>Exclude colors whose lightnes (<code>l</code> in CIELAB color space) is more
 than this value (by default, 80).</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An array with one entry per row, whose names are the matrix `rownames`, containing the
-        color of each row. If `groups` was specified, the array will contain one entry per
-        unique group identifier, whose names are the `as.character` group identifiers, containing
-        the color of each group.</p>
+    <p>An array with one entry per row, whose names are the matrix <code>rownames</code>, containing the
+        color of each row. If <code>groups</code> was specified, the array will contain one entry per
+        unique group identifier, whose names are the <code>as.character</code> group identifiers,
+        containing the color of each group.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>This is intended to provide a "reasonable" set of colors to "arbitrary" data, for use as a

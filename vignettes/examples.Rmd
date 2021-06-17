@@ -23,15 +23,15 @@ This requires us to manually assign a color to each element, or if the data lend
 compute some linear score for each element and use that as an index into a color palette. For large
 multidimensional data, neither approach is practical.
 
-The `chameleon` package provides a quick-and-dirty solution which automatically computes a distinct
-color to each data element, where these colors try to reflect the "coarse" structure of the data;
-that is, "more similar" data elements are assigned "more similar" colors.
+The \code{chameleon} package provides a quick-and-dirty solution which automatically computes a
+distinct color to each data element, where these colors try to reflect the "coarse" structure of the
+data; that is, "more similar" data elements are assigned "more similar" colors.
 
 ## Seatbelts Example
 
 We'll demonstrate this on the seatbelt data, one of the built-in data sets provided by R. To begin,
-we'll load the `chameleon` package and access the seatbelts data. Since the package only works on
-simple matrices, we'll have to convert the seatbelts time series data to a simple matrix:
+we'll load the \code{chameleon} package and access the seatbelts data. Since the package only works
+on simple matrices, we'll have to convert the seatbelts time series data to a simple matrix:
 
 ```{r}
 library(chameleon)
@@ -41,9 +41,9 @@ dim(seatbelts)
 head(seatbelts, 4)
 ```
 
-We now have a matrix with 192 elements and 8 measurements for each one. Using the `data_colors`
-function, we can assign a color to each element and use it to visualize the data, for example
-using a 3D UMAP projection:
+We now have a matrix with 192 elements and 8 measurements for each one. Using the \code{data_colors}
+function, we can assign a color to each element and use it to visualize the data, for example using
+a 3D UMAP projection:
 
 ```{r, fig.show='hold'}
 colors <- data_colors(seatbelts)
@@ -85,12 +85,12 @@ this data into distinct clusters.
 ## PBMC Example
 
 For a more successful grouping example, we'll use some single-cell RNA sequence (sc-RNA) data
-(provided as part of the `chameleon` package). This data contains a `umis` matrix, containing ~1.5K
-metacells (rows), and for each one, the UMI count (# of detected RNA molecules) for each of ~600
-different "feature" genes (columns). In addition, it provides a vector of cell `types` which were
-assigned to the metacells using a supervised analysis pipeline, and a `umap` 2-column matrix
-containing the 2D UMAP projection chosen to visualize the data (a common practice for scRNA data
-analysis).
+(provided as part of the \code{chameleon} package). This data contains a \code{umis} matrix,
+containing ~1.5K metacells (rows), and for each one, the UMI count (# of detected RNA molecules) for
+each of ~600 different "feature" genes (columns). In addition, it provides a vector of cell
+\code{types} which were assigned to the metacells using a supervised analysis pipeline, and a
+\code{umap} 2-column matrix containing the 2D UMAP projection chosen to visualize the data (a common
+practice for scRNA data analysis).
 
 
 ```{r}
@@ -106,7 +106,7 @@ log_fractions <- log2(fractions + 1e-5)
 type_colors <- data_colors(log_fractions, group=pbmc$types)
 ```
 
-We can then use this to color the provided 2D UMAP projection. Here we'll use `ggplot2`:
+We can then use this to color the provided 2D UMAP projection. Here we'll use \code{ggplot2}:
 
 ```{r, fig.show='hold'}
 library(ggplot2)
@@ -124,15 +124,38 @@ annotations does capture some significant structure of the data.
 
 ## Picking distinct colors
 
-The `chameleon` package also provides the lower-lever function `distinct_colors` which attempts to
-select a number of distinct colors, which can be directly assigned to unordered categorical data.
-For example:
+The \code{chameleon} package also provides the lower-lever function \code{distinct_colors} which
+attempts to select a number of distinct colors, which can be directly assigned to unordered
+categorical data. For example:
 
 ```{r}
 distinct_colors(8)
 ```
 
-By default, this excludes low-saturation colors (with a low `hypot(a, b)` value in the CIELAB color
-space), as well as too-dark and too-light colors (with too-low or too-high `l` value in the CIELAB
-color space). This can be controlled by specifying explicit `minimal_saturation`,
-`minimal_lightness` and `maximal_lightness` parameters.
+By default, this excludes low-saturation colors (with a low \code{hypot(a, b)} value in the CIELAB
+color space), as well as too-dark and too-light colors (with too-low or too-high \code{l} value in
+the CIELAB color space). This can be controlled by specifying explicit \code{minimal_saturation},
+\code{minimal_lightness} and \code{maximal_lightness} parameters.
+
+The \code{scale_color_chameleon} convenience function wraps this to allow it to be used this as a
+\code{ggplot2} color scale for unordered (categorical) data. For example:
+
+```{r, fig.show='hold'}
+ggplot(frame, aes(x=xs, y=ys, color=type)) +
+    geom_point(size=0.75) +
+    scale_color_chameleon() +
+    theme(legend.text=element_text(size=12), legend.key.height=unit(14, 'pt'))
+```
+
+And the similar \code{scale_fill_chameleon} function allows it to be used for \code{ggplot2} fill
+colors:
+
+```{r, fig.show='hold'}
+ggplot(frame, aes(x=xs, y=ys, fill=type)) +
+     geom_point(size=0.75, shape=21, color="black", stroke=0.1) +
+     scale_fill_chameleon() +
+     theme(legend.text=element_text(size=12), legend.key.height=unit(14, 'pt'))
+```
+
+Using any of these functions arbitrarily maps the colors to the values, making no attempt to have
+similar colors reflect similarities in the underlying data.
