@@ -1,0 +1,5 @@
+inst/doc
+junk*
+chameleon.Rcheck
+.*.swo
+.*.swp

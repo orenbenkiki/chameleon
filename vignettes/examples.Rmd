@@ -1,0 +1,120 @@
+---
+title: Coloring multidimensional data
+author: Oren Ben-Kiki
+date: 2021-06-16
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{seatbelts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse=TRUE, comment="#>")
+```
+
+## The Problem
+
+Suppose we have some data containing multiple variable values (measurements) for a number of
+elements (observations). We'd like to visualize this data, and when doing so, assign different
+colors to different elements.
+
+This requires us to manually assign a color to each element, or if the data lends itself to it,
+compute some linear score for each element and use that as an index into a color palette. For large
+multidimensional data, neither approach is practical.
+
+## The Provided Solution
+
+The `chameleon` package provides a quick-and-dirty solution which automatically computes a distinct
+color to each data element, where these colors try to reflect the "coarse" structure of the data;
+that is, "more similar" data elements are assigned "more similar" colors.
+
+## Seatbelts Example
+
+We'll demonstrate this on the seatbelt data, one of the built-in data sets provided by R. To begin,
+we'll load the `chameleon` package and access the seatbelts data. Since the package only works on
+simple matrices, we'll have to convert the seatbelts time series data to a simple matrix:
+
+```{r}
+library(chameleon)
+seatbelts <- matrix(as.numeric(Seatbelts), nrow=nrow(Seatbelts), ncol=ncol(Seatbelts))
+colnames(seatbelts) <- colnames(Seatbelts)
+dim(seatbelts)
+head(seatbelts, 4)
+```
+
+We now have a matrix with 192 elements and 8 measurements for each one. Using the `data_colors`
+function, we can assign a color to each element and use it to visualize the data, for example
+using a 3D UMAP projection:
+
+```{r, fig.show='hold'}
+colors <- data_colors(seatbelts)
+
+library(umap)
+layout <- umap(seatbelts, min_dist=0.99, random_state=123456)$layout
+
+plot(layout, col=colors, pch=19, cex=2.5)
+```
+
+Assuming that UMAP has indeed captured some underlying structure of the data, we can see that the
+chosen colors correspond well to this structure, and possibly hint at some additional structure not
+captured well in the 2D projection.
+
+However, 192 colors is "a bit much", so we can't expect them to be very distinct from each other. We
+can reduce the number of colors by grouping the data elements.
+
+For example, since the original seatbelts data is a time series, we can compute for each row the
+year it applies to:
+
+```{r}
+years <- floor(time(Seatbelts))
+unique(years)
+```
+
+And then compute and show a color for each year:
+
+```{r, fig.show='hold'}
+year_colors <- data_colors(seatbelts, group=years)
+
+plot(layout, col=year_colors[years], pch=19, cex=2.5)
+legend('bottomleft', legend=names(year_colors), col=year_colors, lty=1, lwd=3)
+```
+
+We see each year's data is spread over a large part of the projection, but not uniformly so,
+suggesting that while there is some year-to-year variation, it probably isn't the right way to group
+this data into distinct clusters.
+
+## PBMC Example
+
+For a more successful grouping example, we'll use some single-cell RNA sequence (sc-RNA) data
+(provided as part of the `chameleon` package). This data contains a `umis` matrix, containing ~1.5K
+metacells (rows), and for each one, the UMI count (# of detected RNA molecules) for each of ~600
+different "feature" genes (columns). In addition, it provides a vector of cell `types` which were
+assigned to the metacells using a supervised analysis pipeline, and a `umap` 2-column matrix
+containing the 2D UMAP projection chosen to visualize the data (a common practice for scRNA data
+analysis).
+
+
+```{r}
+data('pbmc')
+```
+
+Let's compute a color for each cell type. For better results, we first convert the raw UMI counts to
+a log of the fraction of of the total UMIs in each metacell:
+
+```{r}
+fractions <- pbmc$umis / rowSums(pbmc$umis)
+log_fractions <- log2(fractions + 1e-5)
+type_colors <- data_colors(log_fractions, group=pbmc$types)
+```
+
+We can then use this to color the provided 2D UMAP projection:
+
+```{r, fig.show='hold'}
+plot(pbmc$umap, col=type_colors[pbmc$types], pch=19, cex=0.6)
+legend('topleft', legend=names(type_colors), col=type_colors, lty=1, lwd=3, cex=0.8)
+```
+
+Here we see that, in contrast to the seatbelt years case above, each type (group of metacells) maps
+to a distinct region in the 2D UMAP projection, suggesting that grouping the metacells by the type
+annotations does capture some significant structure of the data.
