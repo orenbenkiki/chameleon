@@ -115,6 +115,8 @@ frame$type <- pbmc$types
 ggplot(frame, aes(x=xs, y=ys, color=type)) +
     geom_point(size=0.75) +
     scale_color_manual(values=type_colors) +
+    theme_light() +
+    guides(color=guide_legend(override.aes=list(size=3))) +
     theme(legend.text=element_text(size=12), legend.key.height=unit(14, 'pt'))
 ```
 
@@ -144,6 +146,8 @@ The \code{scale_color_chameleon} convenience function wraps this to allow it to 
 ggplot(frame, aes(x=xs, y=ys, color=type)) +
     geom_point(size=0.75) +
     scale_color_chameleon() +
+    theme_light() +
+    guides(color=guide_legend(override.aes=list(size=3))) +
     theme(legend.text=element_text(size=12), legend.key.height=unit(14, 'pt'))
 ```
 
@@ -152,9 +156,10 @@ colors:
 
 ```{r, fig.show='hold'}
 ggplot(frame, aes(x=xs, y=ys, fill=type)) +
-     geom_point(size=0.75, shape=21, color="black", stroke=0.1) +
-     scale_fill_chameleon() +
-     theme(legend.text=element_text(size=12), legend.key.height=unit(14, 'pt'))
+    geom_point(shape=21, size=2, stroke=0.2, color="black") +
+    scale_fill_chameleon() +
+    theme_light() +
+    theme(legend.text=element_text(size=12), legend.key.height=unit(14, 'pt'))
 ```
 
 Using any of these functions arbitrarily maps the colors to the values, making no attempt to have
