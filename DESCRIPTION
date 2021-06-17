@@ -10,7 +10,7 @@ Authors@R: c(
 RoxygenNote: 7.0.2
 Encoding: UTF-8
 License: MIT + file LICENSE
-Imports: clue, grDevices, stats, umap
+Imports: clue, ggplot2, grDevices, stats, umap
 LazyData: true
-Suggests: ggplot2, knitr, rmarkdown
-VignetteBuilder: ggplot2, knitr
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
