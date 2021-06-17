@@ -11,7 +11,7 @@ data (as much as possible).
 See the [published R package](https://CRAN.R-project.org/package=chameleon), the
 [rdocumentation](https://www.rdocumentation.org/packages/chameleon), or the [latest github version
 documentation](https://tanaylab.github.io/chameleon/index.html) for details. Specifically, the
-[vignette](https://tanaylab.github.io/chameleon/articles/example.html) explains why and
+[vignette](https://tanaylab.github.io/chameleon/articles/examples.html) explains why and
 how to use this package.
 
 Installation
