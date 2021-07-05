@@ -4,7 +4,7 @@ author: Oren Ben-Kiki
 date: 2021-06-17
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{examples}
+  %\VignetteIndexEntry{Coloring multidimensional data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -43,7 +43,7 @@ head(seatbelts, 4)
 
 We now have a matrix with 192 elements and 8 measurements for each one. Using the \code{data_colors}
 function, we can assign a color to each element and use it to visualize the data, for example using
-a 3D UMAP projection:
+a 2D UMAP projection:
 
 ```{r, fig.show='hold'}
 colors <- data_colors(seatbelts)
