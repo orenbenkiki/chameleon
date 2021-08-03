@@ -4,9 +4,7 @@
 \name{pbmc}
 \alias{pbmc}
 \title{Sample scRNA data of PBMC metacells.}
-\format{
-A list with the three elements described above.
-}
+\format{A list with the three elements described above.}
 \usage{
 data(pbmc)
 }

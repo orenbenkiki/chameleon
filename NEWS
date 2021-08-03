@@ -1,2 +1,4 @@
 0.1
  - Initial Release
+0.2
+ - Properly handle co-linear (2D/1D) data.

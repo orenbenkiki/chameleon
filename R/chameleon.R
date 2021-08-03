@@ -69,9 +69,27 @@ normalized_data <- function(data) {
     raw_ys <- data[,2]
     raw_zs <- data[,3]
 
-    result_xs <- (raw_xs - min(raw_xs)) / (max(raw_xs) - min(raw_xs))
-    result_ys <- (raw_ys - min(raw_ys)) / (max(raw_ys) - min(raw_ys))
-    result_zs <- (raw_zs - min(raw_zs)) / (max(raw_zs) - min(raw_zs))
+    range_xs <- max(raw_xs) - min(raw_xs)
+    range_ys <- max(raw_ys) - min(raw_ys)
+    range_zs <- max(raw_zs) - min(raw_zs)
+
+    if (range_xs == 0) {
+        result_xs <- 0.5
+    } else {
+        result_xs <- (raw_xs - min(raw_xs)) / (max(raw_xs) - min(raw_xs))
+    }
+
+    if (range_ys == 0) {
+        result_ys <- 0.5
+    } else {
+        result_ys <- (raw_ys - min(raw_ys)) / (max(raw_ys) - min(raw_ys))
+    }
+
+    if (range_zs == 0) {
+        result_zs <- 0.5
+    } else {
+        result_zs <- (raw_zs - min(raw_zs)) / (max(raw_zs) - min(raw_zs))
+    }
 
     result <- cbind(result_xs, result_ys, result_zs)
     rownames(result) <- rownames(data)
