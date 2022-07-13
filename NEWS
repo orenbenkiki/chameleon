@@ -2,3 +2,5 @@
  - Initial Release
 0.2
  - Properly handle co-linear (2D/1D) data.
+0.2.1
+ - Allow for asking for very few (0-2) colors.

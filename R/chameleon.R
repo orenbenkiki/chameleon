@@ -41,6 +41,18 @@
 #' chameleon::data_colors(stackloss)
 data_colors <- function(data, run_umap=TRUE, groups=NULL,
                         minimal_saturation=33, minimal_lightness=20, maximal_lightness=80) {
+    if (nrow(data) == 0) {
+        return (c())
+    }
+
+    if (nrow(data) == 1) {
+        return (c("#FFFFFF"))
+    }
+
+    if (nrow(data) == 2) {
+        return (c("#E69F00", "#0072B2"))
+    }
+
     if (run_umap) {
         data <- umap::umap(data, n_components=3)$layout
     }
