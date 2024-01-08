@@ -14,4 +14,6 @@ Imports: clue, ggplot2, grDevices, stats, umap
 Depends: R (>= 3.5.0)
 LazyData: true
 Suggests: knitr, rmarkdown
+URL: https://tanaylab.github.io/chameleon/
+BugReports: https://github.com/tanaylab/chameleon/issues
 VignetteBuilder: knitr
